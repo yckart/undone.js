@@ -1,5 +1,5 @@
 /*!
- * jquery.undone.js 0.0.1 - https://github.com/yckart/jquery.undone.js
+ * jquery.undone.js 0.0.2 - https://github.com/yckart/jquery.undone.js
  * The undo/redo manager for well formed javascript applications.
  *
  * Inspired by: http://blog.asgaard.co.uk/2012/11/21/undo-redo-in-javascript
@@ -9,23 +9,35 @@
  * 2013/03/16
  **/
 ;(function($){
-    var pluginName = "undone";
-    $[pluginName] = $.fn[pluginName] = function (options) {
-        var args = arguments,
-            returns;
+    var pluginName = "undone",
+        Plugin = $[pluginName] = $.fn[pluginName] = function (options) {
+            var args = arguments,
+                returns;
 
-        if (!(this instanceof $)) return $.fn[pluginName].apply($(window), arguments);
+            if (!(this instanceof $)) return $.fn[pluginName].apply($(window), arguments);
 
-        this.each(function() {
-            var instance = $.data(this, 'plugin_' + pluginName);
-            if (typeof options === 'string' && options[0] !== '_') {
-                if (instance instanceof Undone && typeof instance[options] === 'function') {
-                    returns = instance[options].apply(instance, Array.prototype.slice.call(args, 1));
+            this.each(function() {
+                var instance = $.data(this, 'plugin_' + pluginName);
+                if (typeof options === 'string' && options[0] !== '_') {
+                    if (instance instanceof Undone && typeof instance[options] === 'function') {
+                        returns = instance[options].apply(instance, Array.prototype.slice.call(args, 1));
+                    }
+                } else if(!instance) {
+                    $.data(this, 'plugin_' + pluginName, new Undone(options));
                 }
-            } else if(!instance) {
-                $.data(this, 'plugin_' + pluginName, new Undone(options));
-            }
-        });
-        return returns === undefined ? this : returns;
+            });
+            return returns === undefined ? this : returns;
+        };
+
+    Plugin.undo = function(){
+        return $.undone("undo");
+    };
+
+    Plugin.redo = function(){
+        return $.undone("redo");
+    };
+
+    Plugin.clear = function(){
+        return $.undone("clear");
     };
 }(jQuery));
